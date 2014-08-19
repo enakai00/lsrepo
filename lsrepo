@@ -1,0 +1,59 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#
+#   lsrepo.py: Search private Docker registry
+#
+#   2014/08/19 ver1.0
+#
+#   Copyright (C) 2014 Etsuji Nakai
+#
+
+import os, sys, json
+from httplib import HTTPConnection
+
+registry = ""
+
+def get_tags(repo):
+    conn = HTTPConnection(registry)
+    header = {"Content-Type":"application/json"}
+    try:
+        conn.request("GET", "/v1/repositories/" + repo + "/tags", None, header)
+    except Exception:
+        print "Failed to access %s." % registry
+    else:
+        result = json.load(conn.getresponse())
+        if 'error' in result:
+            if result['error'] != 'Repository not found':
+                print result['error']
+            return
+        for item in result.keys():
+            print "%-34s%-20s%-12s" % (repo, item, result[item][:12])
+    finally:
+        conn.close()
+
+def search_repos():
+    conn = HTTPConnection(registry)
+    header = {"Content-Type":"application/json"}
+    try:
+        conn.request("GET", "/v1/search", None, header)
+    except Exception:
+        print "Failed to access %s." % registry
+    else:
+        result = json.load(conn.getresponse())
+        for item in result["results"]:
+            get_tags(item["name"])
+    finally:
+        conn.close()
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        print "Usage: %s REGISTRY [REPOSITORY]" % os.path.basename(sys.argv[0])
+        exit(0)
+    registry = sys.argv[1]
+
+    print "%-34s%-20s%-12s" % ("REPOSITORY", "TAG", "IMAGE ID")
+    if len(sys.argv) > 2:
+        get_tags(sys.argv[2])
+    else:
+        search_repos()
+
