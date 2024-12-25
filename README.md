@@ -4,14 +4,14 @@ lsrepo
 Search private Docker registry
 
 
-##Usage
+## Usage
 
-
+```
  # lsrepo REGISTRY [REPOSITORY]
+```
 
 
-
-##Example
+## Example
 
 ```
 # lsrrepo myregistry.example.com:5000
@@ -33,7 +33,7 @@ enakai00/centos                   latest              b157b77b1a65
 ```
 
 
-##How to run your private registry
+## How to run your private registry
 
 You can use an official registry image from https://registry.hub.docker.com/_/registry/
 
